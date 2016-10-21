@@ -13,5 +13,5 @@ Extracts from the EMBL file:
 __If__ the sequence is about the mRNA:
 
 6. the start and end of the coding sequence
-7. wheter the are the start {atg} and end {taa | tga | tag} codons
+7. wheter there are the start {atg} and end {taa | tga | tag} codons
 8. the coding sequence from the start index to the end index
