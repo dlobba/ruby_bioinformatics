@@ -21,7 +21,7 @@ def get_sequence(file, termination_pattern)
     if (!line.match(termination_pattern))
         abort("Error: Cannot find termination pattern.")
     end
-    
+
     out
 end
 
@@ -46,9 +46,7 @@ def group_sequence (sequence)
     temp_sequence
 end
 
-
 ##########################--MAIN--##############################################
-
 # define global variable will contains the output text
 $out = ""
 $MAX_LENGTH = 80 # Max length for sequence lines in the output file
@@ -104,23 +102,19 @@ File.open(ARGV[0].to_s, "r") do |inp|
            
         when /^\s*SQ.*/
             tot_sequence = get_sequence(inp, /^\s*\/\/\s*/)
-            
         
         when /\s*^FT\s+CDS\s+([+-]*\d+)\s*\.\.\s*([+-]*\d+)\s*/
             start_cds = $1.to_i
             end_cds = $2.to_i
             cds += start_cds.to_s + ".." + end_cds.to_s
-           
         
         when /\s*^FT\s+\/gene\s*=\s*"(\w+)"\s*/
-            
             # /gene appears more the once in the file, so I try to just 
             # keep the first occurence
             if gene.length == 0
               gene += $1 
             end
         end
-        
     end
     
     # id_line after this statement is a completely new object, I've just
@@ -130,7 +124,6 @@ File.open(ARGV[0].to_s, "r") do |inp|
         case sep
             when /^\s*ID\s*(\w+)\s*/
                 ac = $1
-                
             when /\s*(\d+)\s+BP\s*/
                 len += $1.to_s + "bp"
             when /\s*mRNA\s*/
@@ -154,13 +147,11 @@ File.open(ARGV[0].to_s, "r") do |inp|
     # tot_sequence as an array of String (char in Ruby doesn't exists).
     # N.B: Strings in Ruby start from 0! so -1 from start_cds and end_cds 
     if (start_cds != end_cds)
-      
       if (start_cds < 1 ||
           end_cds > tot_sequence.length ||
           end_cds < 0)
               abort ("Error: Invalid cds index")
       end
-            
     
       cds_sequence = tot_sequence[(start_cds - 1 .. end_cds - 1)]
     end
