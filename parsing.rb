@@ -95,8 +95,13 @@ File.open(ARGV[0].to_s, "r") do |inp|
         when /^\s*DE.+/
             tmp = line.split
             tmp = tmp[1..tmp.length]
-            desc += '"' + tmp.join(" ") + '"'
-        
+            desc = tmp.join(" ")
+            i_to_remove = desc =~ /\s*\.+$/
+            if i_to_remove
+                i_to_remove == 0 ? desc = "" : desc = desc[0..i_to_remove - 1]
+            end
+            desc = '"' + desc + '"'
+           
         when /^\s*SQ.*/
             tot_sequence = get_sequence(inp, /^\s*\/\/\s*/)
             
