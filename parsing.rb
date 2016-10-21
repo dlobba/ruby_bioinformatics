@@ -1,3 +1,5 @@
+#! /usr/bin/ruby
+
 require 'test/unit/assertions'
 include Test::Unit::Assertions
 
@@ -185,9 +187,7 @@ end
 
 if (ARGV[1] != nil)
   File.open(ARGV[1].to_s, "w") do |out|
-
-    out.write($out + "\n")
-
+    out.write($out + "\n\n")
   end
 else
   puts $out
