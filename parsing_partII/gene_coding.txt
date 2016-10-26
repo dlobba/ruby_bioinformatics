@@ -1,0 +1,21 @@
+A,Ala,Alanina,GCT,GCC,GCA,GCG
+C,Cys,Cisteina,TGT,TGC
+D,Asp,Acido aspartico,GAT,GAC
+E,Glu,Acido glutammico,GAA,GAG
+F,Phe,Fenilalanina,TTT,TTC
+G,Gly,Glicina,GGT,GGC,GGA,GGG
+H,His,Istidina,CAT,CAC
+I,Ile,Isoleucina,ATT,ATC,ATA
+K,Lys,Lisina,AAA,AAG
+L,Leu,Leucina,TTA,TTG,CTT,CTC,CTA,CTG
+M,Met,Metionina,ATG
+N,Asn,Asparagina,AAT,AAC
+P,Pro,Prolina,CCT,CCC,CCA,CCG
+Q,Gln,Glutammina,CAA,CAG
+R,Arg,Arginina,CGT,CGC,CGA,CGG,AGA,AGG
+S,Ser,Serina,TCT,TCC,TCA,TCG,AGT,AGC
+T,Thr,Treonina,ACT,ACC,ACA,ACG
+V,Val,Valina,GTT,GTC,GTA,GTG
+W,Trp,Triptofano,TGG
+Y,Tyr,Tirosina,TAT,TAC
+,Stop,TGA,TAA,TAG
