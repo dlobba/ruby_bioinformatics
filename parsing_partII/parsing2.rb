@@ -252,17 +252,16 @@ File.open(ARGV[1].to_s, "r") do |map_file|
   codon_distrib.each do |key, value|
     $out += key.downcase.to_s + " => " + value.to_s + "\n"
   end
-  $out += ">Traduzione delle CDS\n"
-  $out += group_sequence(amino_acid_seq, 60)
+  $out += ">Traduzione della CDS\n"
+  $out += group_sequence(amino_acid_seq, 60) + "\n"
   $out += ">Distribuzione delle frequenze degli aminoacidi\n"
   amino_distrib.each do |key, value|
     $out += key.upcase.to_s + " => " + value.to_s + "\n"
   end
   
   amino_acid_seq == $amino_in ?
-    $out += "La traduzione della CDS coincide con la traduzione riportata nel file input\n" :
-    $out += "La traduzione della CDS non coincide con la traduzione riportata nel file input\n" 
+    $out += "La traduzione della CDS coincide con la traduzione riportata nel file input" :
+    $out += "La traduzione della CDS non coincide con la traduzione riportata nel file input" 
   
-  puts $out
-  
+  print $out
 end
