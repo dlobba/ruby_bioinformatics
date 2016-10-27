@@ -7,7 +7,7 @@ include Test::Unit::Assertions
 # We are searching for // in particular, which are the termination characters
 # for the cds.
 # TODO: make the method general for any String object, and not for file objects.
-def get_sequence(file, termination_pattern)
+def get_sequence(file, termination_pattern, keep_last = nil)
 
   assert(file.class == File, "#{file} is not a valid File object.")
   assert(termination_pattern.class == Regexp, "#{termination_pattern} is not a valid Regexp object.")
@@ -20,7 +20,10 @@ def get_sequence(file, termination_pattern)
     out += line
     line = file.gets  # read next line
   end
-
+  
+  if keep_last  
+    out += line
+  end 
   if (!line.match(termination_pattern))
     abort("Error: Cannot find termination pattern.")
   end
@@ -32,13 +35,13 @@ end
 # the 80-th character is '\n'
 # TODO: try to pass sequence by reference (think 'yeld' statement
 # is involved)
-def group_sequence (sequence)
+def group_sequence (sequence, length)
   temp_sequence = ""
   index = 0; cont = 0
   while sequence[index] != nil do
     temp_sequence += sequence[index]
     index += 1
-    if cont < $MAX_LENGTH - 1
+    if cont < length - 1
       cont += 1
     else
       temp_sequence += "\n"
@@ -52,7 +55,6 @@ end
 # calculates sequence codons distribution 
 def frequency_distribution (sequence, length_pattern)
 
-  assert(sequence.length % 3 == 0, "Sequence must be multiple of 3.")
   assert(length_pattern > 0, "The pattern length must be grater than 0")
   frequency = Hash.new
   index = 0
@@ -97,8 +99,7 @@ def base_mapping (base_map, sequence)
     index += length_pattern
   end
 
-  puts out
-
+  out
 end
 
 ##########################--MAIN--##############################################
@@ -106,6 +107,7 @@ end
 $out = ""
 $MAX_LENGTH = 80 # Max length for sequence lines in the output file
 $cds = 0
+$amino_in = "" # It's the cds of the input file that we want to match
 # TODO: should be better to first read all the file, store its value on
 # a String, then process the String.
 # TODO: add safety against miss parameters
@@ -169,6 +171,16 @@ File.open(ARGV[0].to_s, "r") do |inp|
         if gene.length == 0
           gene += $1 
         end
+      when /\s*^FT\s+\/translation\s*=\s*"(\w*)\s*/
+        tmp = $1
+        tmp2 = get_sequence(inp, /"/, true)
+        tmp2 = tmp2.split
+        tmp2.each do |word|
+          if word != "FT"
+            tmp += word
+          end
+        end
+        $amino_in = tmp[0..tmp.length - 2] # I need to delete the "
     end
   end
 
@@ -217,36 +229,40 @@ File.open(ARGV[0].to_s, "r") do |inp|
   # character is \n)
 
   $cds = cds_sequence
-  grouped_sequence = group_sequence(tot_sequence)
-  grouped_cds = group_sequence(cds_sequence)
+  grouped_sequence = group_sequence(tot_sequence, $MAX_LENGTH)
+  grouped_cds = group_sequence(cds_sequence, $MAX_LENGTH)
 
-  # print output
-
-  if (grouped_sequence.length == 0)
-    abort("Error: Invalid EMBL")
-  end
-
-  $out =  [">" + ac, "/length=" + len , "/org=" + org, "/desc=" + desc].join(" ")
-  $out += "\n" + grouped_sequence + "\n"
-  if (mrna)
-    $out += [">" + ac, "/cds=" + cds , "/gene=" + gene].join(" ")
-
-    # Check for start codon and end codon
-    $out += " " + (grouped_cds[0..2].match(/ATG/) ?
-         "/start_codon=YES" : "/start_codon=NO")
-    $out += " " + (cds_sequence[cds_sequence.length - 3 .. cds_sequence.length].match(/(TAG)|(TAA)|(TGA)/) ?
-         "/stop_codon=YES" : "/stop_codon=NO")
-    $out += "\n" + grouped_cds
-  end
 end
-
-
-codon_distrib = frequency_distribution($cds, 3)
 
 File.open(ARGV[1].to_s, "r") do |map_file|
   genome_map = make_genome_mapping(map_file)
   
-  puts $cds, genome_map
-  puts "\nCodificami\n"
-  base_mapping(genome_map, $cds)
+  #puts $cds, genome_map
+  #puts "\nCodificami\n"
+  amino_acid_seq = base_mapping(genome_map, $cds)
+  amino_distrib = frequency_distribution(amino_acid_seq, 1)
+  
+  #puts amino_acid_seq
+  #puts 
+  
+  assert($cds.length % 3 == 0, "Sequence must be multiple of 3.")
+  codon_distrib = frequency_distribution($cds, 3)
+
+  $out = ">Distribuzione delle frequenze dei codoni\n"
+  codon_distrib.each do |key, value|
+    $out += key.downcase.to_s + " => " + value.to_s + "\n"
+  end
+  $out += ">Traduzione delle CDS\n"
+  $out += group_sequence(amino_acid_seq, 60)
+  $out += ">Distribuzione delle frequenze degli aminoacidi\n"
+  amino_distrib.each do |key, value|
+    $out += key.upcase.to_s + " => " + value.to_s + "\n"
+  end
+  
+  amino_acid_seq == $amino_in ?
+    $out += "La traduzione della CDS coincide con la traduzione riportata nel file input\n" :
+    $out += "La traduzione della CDS non coincide con la traduzione riportata nel file input\n" 
+  
+  puts $out
+  
 end
