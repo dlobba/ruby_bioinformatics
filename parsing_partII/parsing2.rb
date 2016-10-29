@@ -8,7 +8,6 @@ include Test::Unit::Assertions
 # for the cds.
 # TODO: make the method general for any String object, and not for file objects.
 def get_sequence(file, termination_pattern, keep_last = nil)
-
   assert(file.class == File, "#{file} is not a valid File object.")
   assert(termination_pattern.class == Regexp, "#{termination_pattern} is not a valid Regexp object.")
   out = ""
@@ -20,10 +19,9 @@ def get_sequence(file, termination_pattern, keep_last = nil)
     out += line
     line = file.gets  # read next line
   end
-  
-  if keep_last  
+  if keep_last
     out += line
-  end 
+  end
   if (!line.match(termination_pattern))
     abort("Error: Cannot find termination pattern.")
   end
@@ -51,10 +49,9 @@ def group_sequence (sequence, length)
   temp_sequence
 end
 
-# Given a complete CDS sequence (trimmed and concatenated), 
-# calculates sequence codons distribution 
+# Given a complete CDS sequence (trimmed and concatenated),
+# calculates sequence codons distribution
 def frequency_distribution (sequence, length_pattern)
-
   assert(length_pattern > 0, "The pattern length must be grater than 0")
   frequency = Hash.new
   index = 0
@@ -67,9 +64,8 @@ def frequency_distribution (sequence, length_pattern)
 end
 
 def make_genome_mapping (file)
-
   assert(file.class == File, "#{file} is not a valid File object.")
-  base_map = Hash.new  
+  base_map = Hash.new
 
   file.each_line do |line|
     if line.match(/\s*Stop\s*/)
@@ -84,7 +80,6 @@ def make_genome_mapping (file)
         end
     end
   end
-  
   base_map
 end
 
@@ -166,10 +161,10 @@ File.open(ARGV[0].to_s, "r") do |inp|
         cds += start_cds.to_s + ".." + end_cds.to_s
 
       when /\s*^FT\s+\/gene\s*=\s*"(\w+)"\s*/
-        # /gene appears more the once in the file, so I try to just 
+        # /gene appears more the once in the file, so I try to just
         # keep the first occurence
         if gene.length == 0
-          gene += $1 
+          gene += $1
         end
       when /\s*^FT\s+\/translation\s*=\s*"(\w*)\s*/
         tmp = $1
@@ -212,7 +207,7 @@ File.open(ARGV[0].to_s, "r") do |inp|
   # We have the cleaned sequence, the start and end indexes of the coding
   # sequence, so we can get the cds (if presents) from the total sequence managing
   # tot_sequence as an array of String (char in Ruby doesn't exists).
-  # N.B: Strings in Ruby start from 0! so -1 from start_cds and end_cds 
+  # N.B: Strings in Ruby start from 0! so -1 from start_cds and end_cds
   if (start_cds != end_cds)
     if (start_cds < 1 ||
       end_cds > tot_sequence.length ||
@@ -223,11 +218,8 @@ File.open(ARGV[0].to_s, "r") do |inp|
     cds_sequence = tot_sequence[(start_cds - 1 .. end_cds - 1)]
   end
 
-
-
   # group sequence in lines whose length is <=80 (the 80-th
   # character is \n)
-
   $cds = cds_sequence
   grouped_sequence = group_sequence(tot_sequence, $MAX_LENGTH)
   grouped_cds = group_sequence(cds_sequence, $MAX_LENGTH)
@@ -236,15 +228,10 @@ end
 
 File.open(ARGV[1].to_s, "r") do |map_file|
   genome_map = make_genome_mapping(map_file)
-  
-  #puts $cds, genome_map
-  #puts "\nCodificami\n"
+
   amino_acid_seq = base_mapping(genome_map, $cds)
   amino_distrib = frequency_distribution(amino_acid_seq, 1)
-  
-  #puts amino_acid_seq
-  #puts 
-  
+
   assert($cds.length % 3 == 0, "Sequence must be multiple of 3.")
   codon_distrib = frequency_distribution($cds, 3)
 
@@ -258,10 +245,10 @@ File.open(ARGV[1].to_s, "r") do |map_file|
   amino_distrib.each do |key, value|
     $out += key.upcase.to_s + " => " + value.to_s + "\n"
   end
-  
+
   amino_acid_seq == $amino_in ?
     $out += "La traduzione della CDS coincide con la traduzione riportata nel file input" :
-    $out += "La traduzione della CDS non coincide con la traduzione riportata nel file input" 
-  
+    $out += "La traduzione della CDS non coincide con la traduzione riportata nel file input"
+
   print $out
 end
