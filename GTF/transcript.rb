@@ -1,4 +1,4 @@
-#! /bin/env/ruby
+#! /usr/bin/ruby
 
 # it's quite a fat class
 # TODO: Separate string function utility from this class
