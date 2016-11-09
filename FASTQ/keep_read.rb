@@ -3,7 +3,7 @@
 require 'test/unit/assertions'
 include Test::Unit::Assertions
 
-q = ARGV[1].to_i
+q_star = ARGV[1].to_i
 p = ARGV[2].to_i
 
 def ascii_to_quality (char)
@@ -37,9 +37,8 @@ File.open(ARGV[0].to_s, 'r') do |file|
         line3 = file.gets.chomp
         line4 = file.gets.chomp
         
-        sequence_quality = count_quality_bases(line4, p) / line4.length
-        
-        if sequence_quality > p
+        sequence_quality = count_quality_bases(line4, q_star) / line4.length
+        if sequence_quality >= p
         
             $out +=  [line1, line2, line3, line4].join("\n")
         
