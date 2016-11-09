@@ -1,10 +1,6 @@
 #! /usr/bin/ruby
-
 require 'test/unit/assertions'
 include Test::Unit::Assertions
-
-q_star = ARGV[1].to_i
-p = ARGV[2].to_i
 
 def ascii_to_quality (char)
     assert(char.class == String, "Character expected, given: #{char}")
@@ -18,7 +14,7 @@ def quality_to_ascii (quality)
 end
 
 def count_quality_bases (sequence, q_star)
-    counter = 0
+    counter = 0.0 # Must be double, so added decimal value
     sequence.split("").each do |char|
         quality = ascii_to_quality(char)
         quality >= q_star ? counter += 1 : counter
@@ -26,24 +22,21 @@ def count_quality_bases (sequence, q_star)
     counter
 end
 
+q_star = ARGV[1].to_i
+p = ARGV[2].to_f
 $out = ""
 
 File.open(ARGV[0].to_s, 'r') do |file|
-
     while !file.eof? do
-        
         line1 = file.gets.chomp
         line2 = file.gets.chomp
         line3 = file.gets.chomp
         line4 = file.gets.chomp
-        
-        sequence_quality = count_quality_bases(line4, q_star) / line4.length
+        sequence_quality =  count_quality_bases(line4, q_star) /
+                            line4.length
         if sequence_quality >= p
-        
-            $out +=  [line1, line2, line3, line4].join("\n")
-        
+            $out +=  [line1, line2, line3, line4].join("\n") + "\n"
         end
     end
 end
-
-puts $out
+print $out
