@@ -8,9 +8,9 @@ def show_help()
 	tmp = "Sequences_selector\n Given a FASTA file it selects sequences that satisfy\n" +
 	"the criterias defined by the parameters.\n" +
 	"options:\n" +
-	"-x <nth_sequence>\t\t --extracts the nth sequence if presents\n" +
+	"-x <nth_sequence>\t\t --extracts the nth sequence if presents, the first sequence is the number 1\n" +
 	"-X <from_sequence> <to_sequence> --extracts from the <from_sequence> " +
-		"to the <to_sequence> sequences if present\n" +
+		"to the <to_sequence> sequences if present, extremes included\n" +
 	"-H <header_string>\t\t --extacts all the sequences that contain <header_string> " +
 		"in the header section\n" +
 	"-C <content_string>\t\t --extracts all the sequences that contain <content_string> " +
@@ -25,7 +25,8 @@ def show_help()
 	puts tmp
 end
 
-
+# "eats" each argument and checks its correctness, give in
+# output an hash with the parameters parsed 
 def process_parameters(array_parameter)
 
 	tmp_array = array_parameter
@@ -44,7 +45,6 @@ def process_parameters(array_parameter)
 	while !tmp_array.empty?
 
 		case tmp_array[0]
-
 		when "-x"
 			# =~ fail if the element doesn't exist, so
 			# there is no need to check its existence
@@ -162,8 +162,18 @@ def process_sequence(sequence, parameters)
 	return true
 end
 
+
 def sequences_selector (file_path, parameters, file_output)
 	
+	cap = -1 # default value
+	if parameters[:nth_sequence] != nil
+		cap = parameters[:nth_sequence]
+	end
+
+	if parameters[:to_sequence] != nil
+		cap = parameters[:to_sequence]
+	end
+
 	File.open(file_path, "r") do |fasta_file|
 
 		tmp_content = ""
@@ -171,9 +181,10 @@ def sequences_selector (file_path, parameters, file_output)
 		is_first_header = true
 		num_sequence = 0
 		
-		fasta_file.each_line do |line|
-
-			clean_line = line.strip
+		#fasta_file.each_line do |line|
+		while !fasta_file.eof? && (num_sequence <= cap || cap == -1)
+			
+			clean_line = fasta_file.gets.strip
 			if clean_line.length > 0
 
 				if clean_line[0] == ">"
@@ -191,7 +202,7 @@ def sequences_selector (file_path, parameters, file_output)
 							write_sequence(tmp_sequence, file_output)
 						end
 						tmp_sequence = nil
-						
+
 					end
 
 					num_sequence += 1
@@ -217,8 +228,9 @@ def sequences_selector (file_path, parameters, file_output)
 	end
 end
 
+
 # the program continues to open the file, writes one sequence to it and
-# close it. This is done to avoid having in memory a very large string that
+# closes it. This is done to avoid having in memory a very large string that
 # contains sequences already processed. The problem in doing so is relative
 # to the file opening time, but this should not be a huge problem
 def write_sequence(sequence, filepath_output)
@@ -239,10 +251,11 @@ def write_sequence(sequence, filepath_output)
 
 end
 
+
 # main program ################################################################
 begin
-	parameters = process_parameters(ARGV)
 	
+	parameters = process_parameters(ARGV)
 	# if -h flag is set, display program help and quit the program
 	if parameters[:help] == true
 		show_help
