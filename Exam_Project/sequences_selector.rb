@@ -11,9 +11,9 @@ def show_help()
 	"-x <nth_sequence>\t\t --extracts the nth sequence if presents, the first sequence is the number 1\n" +
 	"-X <from_sequence> <to_sequence> --extracts from the <from_sequence> " +
 		"to the <to_sequence> sequences if present, extremes included\n" +
-	"-H <header_string>\t\t --extacts all the sequences that contain <header_string> " +
+	"-H <header_string>\t\t --extacts all the sequences that contain <header_string> (case insensitive)" +
 		"in the header section\n" +
-	"-C <content_string>\t\t --extracts all the sequences that contain <content_string> " +
+	"-C <content_string>\t\t --extracts all the sequences that contain <content_string> (case sensitive)" +
 		"in the content section of the sequence\n" +
 	"-O <output_file>\t\t --saves the output to the specified <output_file>\n" +
 	"-h \t\t\t\t --displays this help\n\n" +
@@ -65,7 +65,6 @@ def process_parameters(array_parameter)
 				raise InvalidParameter.new ("Integers values for the sequences "\
 					"requested are needed, given: " + tmp_array[1] + " " + tmp_array[2])
 			end
-
 
 		when "-H"
 			if tmp_array[1] != nil && header_condition == nil
@@ -148,7 +147,7 @@ def process_sequence(sequence, parameters)
 	end
 
 	if parameters[:header_condition] != nil
-		if !sequence[:header].include?(parameters[:header_condition])
+		if !sequence[:header].downcase.include?(parameters[:header_condition].downcase)
 			return false
 		end
 	end
